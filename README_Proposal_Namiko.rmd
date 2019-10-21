@@ -1,0 +1,62 @@
+Final Project Proposal  
+--------------------------------------------------------------------------------  
+
+### 1. Objective  
+#### Since many natural history museums have their own collection databases that are organized in their own way, specimen-based paleontological studies require patient works in searching for relevant specimens stored in museums worldwide. A recently developed biospecimen database, called iDigBio, drastically improved this searching environment by allowing access to multiple collection databases simultaneously, however, it is still time-consuming in identifying relevant museums and collections for a specific set of taxa. Thus, the objective of this project is to make use of this international and inter-museum collection database and to make a program that provides useful information for the users in identifying relevant museum specimens regarding specific taxa of focus.  
+
+
+### 2. Data Source  
+* #### Museum Collection Information  
+#### This will be downloaded from iDigBio database (https://www.idigbio.org/) for certain taxonomic category by using R package _ridigbio_.  
+* #### Taxonomic List to Demonstrate the Program  
+#### This will be a list of taxa I'm working on in my theses, which covers the Phylum Arthropoda, Class Trilobita, Order Phacopida. The list is in the Generic level and comprises approximately 200 taxa.  
+
+##### _The program will be created in a way that can flexibly accommodate any taxonomic framework by using user-dependent arguments so that it won't be confined to my current research group._  
+
+
+### 3. Language  
+#### Manipulating R packages such as _rdigbio_ and visualizing _Knitr_ will be done in R.  
+#### The downloaded collection information will be treated in bash.  
+
+
+### 4. Implementation  
+#### The specimen records will be downloaded by using a Rpackage _ridingbio_. Both taxonomic rank and name for the search will be set as user-dependent argument, so that this program can accomodate any scope of study.  
+```  
+## search command example
+## $ARG1: Taxonomic category such as Class, Order, and Family.
+## $ARG2: Any taxonomic name.
+idig_seach_records(rq=list($ARG1="$ARG2"))
+```  
+
+#### Use `awk` command to select a column and search for specific generic names listed in the input text file. A loop may be useful by setting a variable as a list of genera for the search, which is imported from the text file.   
+```  
+## Example  
+## The field 68th is "dwc:genus" in raw iDigBio data.
+## $Gen: Variable for a genus name.
+awk '$68~/$Gen/{print}'
+```  
+
+#### Use `sort` and _-k_ option to sort the data by specific fields. For example, the column 92nd is Institutional Code.   
+#### The fields will be rearranged by using `awk`. In this step, only necessary fields are selected and assembled.  
+```  
+## Use "," as a delimiter and print designated columns in a meaningful order.
+awk -F , '{print $ColumnNumber, $ColumnNumber, $ColumnNumber}'
+```  
+
+#### Then, the data will be split by institutional code and each data block will be set as a R object. `kable` command in a R package _knitr_ will read this R object, then create a table of specimen information for each museum.   
+
+
+### 5. Expected Products  
+#### A table of spcimen infomations for each museums.
+```{r echo=FALSE}
+## Example of output format for Yale Peabody Museum of Natural History.
+## The input data is temporarily created as test.csv. Upon submission, it will be read directory from R object through the above procedure.
+library(knitr)
+x <- read.csv(file="./test.csv")
+kable(x, format = "html", col.names = c("MusID", "ColID", "Order", "Fam", "Gen", "SubGen", "Sp.", "Author", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l", caption = "Yale Peabody Museum of Natural History")
+```  
+
+
+### 6. Questions for Instructor  
+#### I want to leave some flexibility for the user by applying user-dependent arguments, for example in the taxonomic category (Class, Order, Family) and taxonomic name when downloading raw data (package _ridigbio_). For this purpose, is it more suitable in building the entire program as a single .sh file rather than making it as a Rmarkdown?
+#### I find the rendering ability of Rmarkdown very convenient, however, running a shell script with simple `bash FILENAME.sh ARG1 ARG2` commands seems more flexible.  
