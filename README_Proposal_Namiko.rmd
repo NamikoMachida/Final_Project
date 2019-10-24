@@ -35,6 +35,7 @@ idig_seach_records(rq=list($ARG1="$ARG2"))
 ## $Gen: Variable for a genus name.
 awk '$68~/$Gen/{print}'
 ```  
+AH: I am wondering if some of this subsetting might be more easily achieved in R?  Can you provide a raw dataset snippet?
 
 #### Use `sort` and _-k_ option to sort the data by specific fields. For example, the column 92nd is Institutional Code.   
 #### The fields will be rearranged by using `awk`. In this step, only necessary fields are selected and assembled.  
@@ -59,4 +60,6 @@ kable(x, format = "html", col.names = c("MusID", "ColID", "Order", "Fam", "Gen",
 
 ### 6. Questions for Instructor  
 #### I want to leave some flexibility for the user by applying user-dependent arguments, for example in the taxonomic category (Class, Order, Family) and taxonomic name when downloading raw data (package _ridigbio_). For this purpose, is it more suitable in building the entire program as a single .sh file rather than making it as a Rmarkdown?
+AH: If you are intending to do most of the work in bash and only using R for the download, then yes, a README and a .sh that incldues a call to R would be best.
 #### I find the rendering ability of Rmarkdown very convenient, however, running a shell script with simple `bash FILENAME.sh ARG1 ARG2` commands seems more flexible.  
+AH: .Rmd is really only useful if you are using R.  Give it some time.
