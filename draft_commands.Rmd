@@ -1,0 +1,17 @@
+packages needed
+```{r}
+install.packages("ridigbio")
+install.packages("knitr")
+```
+```{r}
+library(ridigbio)
+library(knitr)
+```
+
+-------------------------------------------------------------------------------
+```{r}
+source("./function_final_project.R")
+col.in.world(genera, "Acernaspis")
+```
+
+idig_seach_records(rq=list($ARG1="$ARG2"))
