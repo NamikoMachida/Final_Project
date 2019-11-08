@@ -9,9 +9,21 @@ library(knitr)
 ```
 
 -------------------------------------------------------------------------------
+use function???
 ```{r}
 source("./function_final_project.R")
-col.in.world(genera, "Acernaspis")
+col.in.world("class", "Trilobita")
+```
+------------------------------------------------------------------------
+
+downloading data. Rank must be order level or lower because records more than 100000 is not allowed in ridigbio.
+```{r}
+data <- idig_search_records(rq=list(order="Phacopida"), fields = "all")
 ```
 
-idig_seach_records(rq=list($ARG1="$ARG2"))
+structure
+```{r}
+nrow(data)
+ncol(data)
+```
+
