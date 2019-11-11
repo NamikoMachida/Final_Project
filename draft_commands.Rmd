@@ -1,29 +1,85 @@
 packages needed
 ```{r}
 install.packages("ridigbio")
+install.packages("dplyr")
 install.packages("knitr")
 ```
 ```{r}
 library(ridigbio)
+library(dplyr)
 library(knitr)
 ```
 
 -------------------------------------------------------------------------------
-use function???
-```{r}
+Use of function???
+(How to include Rank(type closure??) into argumentation?)
+(temporarily functions are split into taxonomic ranks)
+```{r}  
+# Order level search
 source("./function_final_project.R")
-col.in.world("class", "Trilobita")
-```
+collection_order("Phacopida")
+```  
+
+```{r}  
+# Family level search
+source("./function_final_project.R")
+collection_family("Phacopidae")
+```  
+
+```{r}  
+# Genus level search
+source("./function_final_project.R")
+collection_genus("Acernaspis")
+```  
+
+
 ------------------------------------------------------------------------
+[experiments]
 
-downloading data. Rank must be order level or lower because records more than 100000 is not allowed in ridigbio.
+# sorting
 ```{r}
-data <- idig_search_records(rq=list(order="Phacopida"), fields = "all")
+data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
+data_sorted <- data[order(data$institutioncode),]
+head(data_sorted, n=10)
 ```
 
-structure
+# this works
 ```{r}
-nrow(data)
-ncol(data)
+data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
+
+# extract neccessarycolumns.
+col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
+data_selected <- select(data, col_needed)
+
+# make a list of institution codes.
+# convert it into a vector
+inst_code_list <- unique(data_selected$institutioncode)
+as.vector(inst_code_list)
+
+# for loop to make a table for each institution
+# delete institution code
+# make a table (Huge!!)
+data_fortab <- data_selected
+data_fortab$institutioncode <- NULL
+kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l")
 ```
 
+# next goal!
+# How to apply for loop over a vector and create multiple tables?
+for (inst_code in inst_code_list) {
+  data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
+  data_fortab$institutioncode <- NULL
+  kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l", caption = inst_code)
+}
+
+# this works!
+```{r}
+data_fortab <- data_selected[data_selected$institutioncode=="ypm", ]
+data_fortab$institutioncode <- NULL
+kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l", caption = "ypm")
+```
+
+
+
+
+? authorship??
