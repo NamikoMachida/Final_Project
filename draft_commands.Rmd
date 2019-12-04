@@ -3,11 +3,14 @@ packages needed
 install.packages("ridigbio")
 install.packages("dplyr")
 install.packages("knitr")
+install.packages("kableExtra")
+webshot::install_phantomjs()
 ```
 ```{r}
 library(ridigbio)
 library(dplyr)
 library(knitr)
+library(kableExtra)
 ```
 
 -------------------------------------------------------------------------------
@@ -64,22 +67,44 @@ data_fortab$institutioncode <- NULL
 kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l")
 ```
 
-# next goal!
-# How to apply for loop over a vector and create multiple tables?
-for (inst_code in inst_code_list) {
-  data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
-  data_fortab$institutioncode <- NULL
-  kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l", caption = inst_code)
-}
+
 
 # this works!
 ```{r}
-data_fortab <- data_selected[data_selected$institutioncode=="ypm", ]
-data_fortab$institutioncode <- NULL
-kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l", caption = "ypm")
+dataframe_list <- list()
+for (i in 1:length(inst_code_list)){
+  data_fortab <- data_selected
+  inst_code <- inst_code_list[i]
+  
+  data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
+  data_fortab$institutioncode <- NULL
+  dataframe_list <- append(dataframe_list, list(data_fortab))
+  names(dataframe_list)[i] <- paste0("data_fortab",i)
+}
+
+kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
+  kable_styling("striped") %>%
+  save_kable("./table.pdf")
 ```
 
 
 
 
+How about paleobioDB's tool to map paleo map?
+```{r}
+install.packages("paleobioDB")
+```
+```{r}
+library(paleobioDB)
+```
+
+
 ? authorship??
+
+
+Error!
+```{r}
+install.packages("devtools")
+library(devtools)
+```
+
