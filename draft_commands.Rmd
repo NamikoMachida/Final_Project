@@ -69,7 +69,7 @@ kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen"
 
 
 
-# this works!
+# this works with problem (in pdf.) May be it's not good to output as PDF.
 ```{r}
 dataframe_list <- list()
 for (i in 1:length(inst_code_list)){
