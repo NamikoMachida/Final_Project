@@ -19,6 +19,7 @@ collection_family <- function (Taxon) {
   head(data, n=10)
 }
 
+
 # Genus level search
 collection_genus <- function (Taxon) {
   data <- idig_search_records(rq=list(genus=Taxon), fields = "all")
@@ -29,13 +30,24 @@ collection_genus <- function (Taxon) {
   # convert it into a vector
   inst_code_list <- unique(data_selected$institutioncode)
   as.vector(inst_code_list)
+  
   # for loop to make a table for each institution
-  # delete institution code
-  # make a table (Huge!!)
-  data_fortab <- data_selected
-  data_fortab$institutioncode <- NULL
-  kable(data_fortab, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l")
+  # delete the column of institution code
+  # make tables (Huge!!)
+  dataframe_list <- list()
+  for (i in 1:length(inst_code_list)){
+    data_fortab <- data_selected
+    inst_code <- inst_code_list[i]
+  
+    data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
+    data_fortab$institutioncode <- NULL
+    dataframe_list <- append(dataframe_list, list(data_fortab))
+    names(dataframe_list)[i] <- paste0("data_fortab",i)
+  }
+  kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l")
 }
+
+
 
 
 
