@@ -1,26 +1,59 @@
 # not recommended due to large data size.
 # How about using a loop to search in multiple order levels?
 # List of order names for specified class needed. (May be available from PBDB??)
-collection_class <- function (Taxon) {
-  data <- idig_search_records(rq=list(class=Taxon), fields = "all")
-  head(data, n=10)
+
+# All rank search!
+collection <- function (Rank, Taxon) {
+  # get data from idigbio
+  listname <- c(Rank)
+  idiglist <- list(Taxon)
+  names(idiglist) <- listname
+  data <- idig_search_records(rq=idiglist, fields = "all")
+  
+  # extract neccessary columns.
+  col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
+  data_selected <- select(data, col_needed)
+  #sort by institutional code, genus, species.
+  data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
+  # delete rows if institutional code is NA.
+  data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
+  
+  # make a list of institution codes.
+  # remove na value
+  inst_code_list <- unique(data_selected_sorted$institutioncode)
+  inst_code_list <- na.omit(inst_code_list)
+  
+  # make empty vectors
+  start_row <- c()
+  end_row <- c(0)
+  # fill the vectors with starting and ending # of rows for each institution.
+  for (i in 1:length(inst_code_list)){
+    start_row <- c(start_row, end_row[i]+1)
+    row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
+    end_row <- c(end_row, start_row[i]+row_by_inst-1)
+  }
+  # delete the first element of end_row: value 0  
+  end_row <- end_row[-1]
+  # create a matrix that contain start row and end row of each institution
+  row_range_inst <- rbind(inst_code_list, start_row, end_row)
+  
+  # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)  
+  
+  
+  # Still need to pack-rows!
+  data_selected_sorted$institutioncode <- NULL
+  kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Fam", "Gen", "sp.", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l") %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 11, fixed_thead = T)%>%
+    # Header arrangement
+    add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+    # Italize Genus and species names.
+    column_spec(column = c(5,6), italic = TRUE)
 }
 
-# Order level serach
-# (Use If statement to report errors if inappropriate rank is provided (order, family, genus))
-collection_order <- function (Taxon) {
-  data <- idig_search_records(rq=list(order=Taxon), fields = "all")
-  head(data, n=10)
-}
-
-# Family level search
-collection_family <- function (Taxon) {
-  data <- idig_search_records(rq=list(family=Taxon), fields = "all")
-  head(data, n=10)
-}
 
 
-# Genus level search
+
+# Genus level search (NULL)
 collection_genus <- function (Taxon) {
   data <- idig_search_records(rq=list(genus=Taxon), fields = "all")
   # extract neccessarycolumns.
@@ -44,18 +77,11 @@ collection_genus <- function (Taxon) {
     dataframe_list <- append(dataframe_list, list(data_fortab))
     names(dataframe_list)[i] <- paste0("data_fortab",i)
   }
-  kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
-    kable_styling(bootstrap_options = "striped", full_width = F)
+  # If the table is output as PDF, fixed_thead = T is not needed.
+  print(kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
+          kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 11, fixed_thead = T))
+  cat("\n")
 }
-
-
-
-# Species level serach
-collection_species <- function (Taxon) {
-  data <- idig_search_records(rq=list(species=Taxon), fields = "all")
-  head(data, n=10)
-}
-
 
 
 
