@@ -2,6 +2,13 @@
 # How about using a loop to search in multiple order levels?
 # List of order names for specified class needed. (May be available from PBDB??)
 
+#capitalize function
+cap_head <- function(text) {
+  substr(text, 1, 1) <- toupper(substr(text, 1, 1))
+  text
+}
+
+
 # All rank search!
 collection <- function (Rank, Taxon) {
   # get data from idigbio
@@ -24,30 +31,29 @@ collection <- function (Rank, Taxon) {
   inst_code_list <- na.omit(inst_code_list)
   
   # make empty vectors
-  start_row <- c()
-  end_row <- c(0)
-  # fill the vectors with starting and ending # of rows for each institution.
+  row_range_vector <- c()
+  # get # of rows for each institution, and append it to the previous vector.
   for (i in 1:length(inst_code_list)){
-    start_row <- c(start_row, end_row[i]+1)
     row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
-    end_row <- c(end_row, start_row[i]+row_by_inst-1)
+    row_range_vector <- c(row_range_vector, row_by_inst)
   }
-  # delete the first element of end_row: value 0  
-  end_row <- end_row[-1]
-  # create a matrix that contain start row and end row of each institution
-  row_range_inst <- rbind(inst_code_list, start_row, end_row)
+  # name the vector element with institutional names.
+  names(row_range_vector) <- inst_code_list
   
   # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)  
+  col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
+  data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
   
-  
-  # Still need to pack-rows!
+  # Make a table
   data_selected_sorted$institutioncode <- NULL
-  kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Fam", "Gen", "sp.", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l") %>%
-    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 11, fixed_thead = T)%>%
+  kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
     # Header arrangement
-    add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+    add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
     # Italize Genus and species names.
-    column_spec(column = c(5,6), italic = TRUE)
+    column_spec(column = c(4,5), italic = TRUE)%>%
+    # Group rows with institutional categories.
+    pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
 }
 
 

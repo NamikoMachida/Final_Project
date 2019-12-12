@@ -17,7 +17,7 @@ library(kableExtra)
 ```{r}
 #All rank search!
 source("./function_final_project.R")
-collection(Rank = "genus", Taxon = "Reedops")
+collection(Rank = "genus", Taxon = c("Acernaspis", "Ananaspis"))
 ```
 
 
@@ -40,33 +40,90 @@ compare_taxa_genus(Taxon = "Acernaspis", Path = "./mytaxa.txt")
 ```{r}
 compare_taxa_genus <- function (Taxon, Path) {
   data <- idig_search_records(rq=list(genus=Taxon), fields = "all")
-  col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
-  data_selected <- select(data, col_needed)
+# extract neccessary columns.
+col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
+data_selected <- select(data, col_needed)
+#sort by institutional code, genus, species.
+data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
+# delete rows if institutional code is NA.
+data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
 
-  inst_code_list <- unique(data_selected$institutioncode)
-  as.vector(inst_code_list)
+# make a list of institution codes.
+# remove na value
+inst_code_list <- unique(data_selected_sorted$institutioncode)
+inst_code_list <- na.omit(inst_code_list)
+  
+# make empty vectors
+row_range_vector <- c()
+# get # of rows for each institution, and append it to the previous vector.
+for (i in 1:length(inst_code_list)){
+row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
+row_range_vector <- c(row_range_vector, row_by_inst)
+}
+# name the vector element with institutional names.
+names(row_range_vector) <- inst_code_list
 
-  data_selected_vector <- c()
-  for (code in 1:length(inst_code_list)){
-    data_fortab <- data_selected
-    inst_code <- inst_code_list[code]
-    
-    data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
-    data_fortab$institutioncode <- NULL
-    data_selected_vector <- c(data_selected_vector, list(data_fortab))
+# Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
+col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
+data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
+  
+
+  
+  
+# [comparison experiment]
+MyTaxa <- read.delim(file = Path, header = FALSE, sep = "", col.names = c("Genus", "species"))
+# unique combination of genus and species
+test <- unique(data_selected_sorted[,c("genus","specificepithet")])
+
+# Search for the unique set of genus and species names in MyTaxa. If exist, do nothing. If not exist, get the position.\
+test$genus %in% MyTaxa$Genus
+
+for (row in length(data_selected_sorted$genus)) {
+#If the genus doesn't exist, take all rows of the genus name in test into vector.
+# position: rows that doesnot exist in MyTaxa
+position <- which(!data_selected_sorted$genus %in% MyTaxa$Genus)
+
+# if the genus exist, proceed to species comparison.  
+# unique combination of gen and sp, of which the gen exist in MyTaxa
+position <- which(!MyTaxa[, "Genus"] == data_selected_sorted[1, "genus"] & !MyTaxa[, "species"] == data_selected_sorted[1, "specificepithet"])
+
+# ? How to get row position within data_selected_sorted that has a gen and sp combination not in MyTaxa.
+MyTaxa[1, "Genus"] %in% data_selected_sorted[, "genus"] & MyTaxa[1, "species"] %in% data_selected_sorted[, "specificepithet"]
+
+}
+
+
+vector <- c()
+# search for the position of missing genus and species name combination
+position <- which(data_selected_sorted$genus == "Acernaspis" & data_selected_sorted$specificepithet == "orestes")
+vector <- c(vector, position)
+
+  
+
+data_selected_sorted$institutioncode <- NULL
+kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
+  # Header arrangement
+  add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+  # Italize Genus and species names.
+  column_spec(column = c(4,5), italic = TRUE)%>%
+  row_spec(vector, color = "red")%>%
+  # Group rows with institutional categories.
+  pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
+}
+```
+```{r}
+# NULL
+for (Gen in 1:length(data_selected_sorted$genus)){
+  if (data_selected_sorted$genus[Gen] %in% MyTaxa$Genus){
+    data_selected_sorted$s[Gen] %in% MyTaxa$Genus
   }
+}
+data_selected_sorted
 
-  MyTaxa <- read.delim(file = Path, header = FALSE, sep = "", col.names = c("Genus", "species"))
-
-  for (obj in 1:length(data_selected_vector)){
-    UnCodedSp_vector <- data_selected_vector[[obj]][["specificepithet"]] %in% MyTaxa$species
-    UnCodedSp_row <- which(UnCodedSp_vector==FALSE)
-    print(kable(data_selected_vector[[obj]], format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
-    kable_styling(bootstrap_options = "striped", full_width = F) %>%
-    row_spec(UnCodedSp_row, color = "red"))
-    cat("\n")
-# What does the cat("\n") mean? (https://stackoverflow.com/questions/39650166/r-why-kable-doesnt-print-inside-a-for-loop)
-  }
+for (obj in 1:length(data_selected_vector)){
+  UnCodedSp_vector <- data_selected_vector[[obj]][["specificepithet"]] %in% MyTaxa$species
+  UnCodedSp_row <- which(UnCodedSp_vector==FALSE)
 }
 ```
 
@@ -75,6 +132,8 @@ compare_taxa_genus <- function (Taxon, Path) {
 ------------------------------------------------------------------------------
 [experiment: treat data as dataframe (not as a list)] : SUCCESS!
 ```{r}
+source("./function_final_project.R")
+
 data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
 
 # extract neccessary columns.
@@ -91,33 +150,33 @@ inst_code_list <- unique(data_selected_sorted$institutioncode)
 inst_code_list <- na.omit(inst_code_list)
   
 # make empty vectors
-start_row <- c()
-end_row <- c(0)
-# fill the vectors with starting and ending # of rows for each institution.
+row_range_vector <- c()
+# get # of rows for each institution, and append it to the previous vector.
 for (i in 1:length(inst_code_list)){
-  start_row <- c(start_row, end_row[i]+1)
-  row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
-  end_row <- c(end_row, start_row[i]+row_by_inst-1)
+row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
+row_range_vector <- c(row_range_vector, row_by_inst)
 }
-# delete the first element of end_row: value 0  
-end_row <- end_row[-1]
-# create a matrix that contain start row and end row of each institution
-row_range_inst <- rbind(inst_code_list, start_row, end_row)
-  
+# name the vector element with institutional names.
+names(row_range_vector) <- inst_code_list
+
+
+
 # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
+col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
+data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
 
 
-  
-# Still need to pack-rows!
+# Make a table
 data_selected_sorted$institutioncode <- NULL
-kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Fam", "Gen", "sp.", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 11, fixed_thead = T)%>%
+kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
   # Header arrangement
-  add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+  add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
   # Italize Genus and species names.
-  column_spec(column = c(5,6), italic = TRUE)
+  column_spec(column = c(4,5), italic = TRUE)%>%
+  # Group rows with institutional categories.
+  pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
 ```
-
 
 
 
