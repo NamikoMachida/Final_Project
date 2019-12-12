@@ -17,29 +17,60 @@ library(kableExtra)
 ```{r}
 #All rank search!
 source("./function_final_project.R")
-collection(Rank = "genus", Taxon = c("Acernaspis", "Ananaspis"))
+collection(Rank = "family", Taxon = "Phacopidae")
 ```
-
-
-```{r}  
-# Genus level search
-source("./function_final_project.R")
-collection_genus("Acernaspis")
-```  
-
-
-------------------------------------------------------------------------
-[experiments]
 
 taxa list comparison
 ```{r}
 source("./function_final_project.R")
-compare_taxa_genus(Taxon = "Acernaspis", Path = "./mytaxa.txt")
+compare_taxa(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
 ```
 
+
+--------------------------------------------------------------------------
+[experiment] Breaking down compare_taxa function. Computation time trial.
 ```{r}
-compare_taxa_genus <- function (Taxon, Path) {
-  data <- idig_search_records(rq=list(genus=Taxon), fields = "all")
+  Search_Missing_Taxa <- TRUE
+  data <- idig_search_records(rq=list(family="Phacopidae"), fields = "all")
+  
+  # extract neccessary columns.
+  col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
+  data_selected <- select(data, col_needed)
+  #sort by institutional code, genus, species.
+  data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
+  # delete rows if institutional code is NA.
+  data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
+  
+  # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
+  col_to_cap <- c("order","family","genus","country","stateprovince","county","formation")
+  data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
+  
+  # Read my taxon list file using function argument PATH.
+  MyTaxa <- read.delim(file = "./mytaxa.txt", header = FALSE, sep = ",", col.names = c("Genus", "species"))
+  # Conduct get row numbers of taxa from data_selected_sorted that can be found within MyTaxa.
+  position <- which(data_selected_sorted[, "genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "specificepithet"] %in% MyTaxa[, "species"])
+  # If Search_Missing_Taxa argument is TRUE, reverse the previous search and produce row numbers of taxa that are missing from MyTaxa.
+  if (Search_Missing_Taxa == TRUE){
+    all_rows <- 1:nrow(data_selected_sorted)
+    position <- all_rows[!all_rows %in% position]
+  }
+
+kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
+    # Header arrangement
+    add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+    # Highlight the rows specified by position.
+    row_spec(position, color = "red")%>%
+    # Group rows with institutional categories.
+  collapse_rows(columns = 1, valign = "top")
+```
+
+
+
+------------------------------------------------------------------------
+[experiments]
+```{r}
+data <- idig_search_records(rq=list(genus=c("Acernaspis", "Ananaspis")), fields = "all")
 # extract neccessary columns.
 col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
 data_selected <- select(data, col_needed)
@@ -66,65 +97,35 @@ names(row_range_vector) <- inst_code_list
 # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
 col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
 data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
-  
 
-  
-  
-# [comparison experiment]
-MyTaxa <- read.delim(file = Path, header = FALSE, sep = "", col.names = c("Genus", "species"))
-# unique combination of genus and species
-test <- unique(data_selected_sorted[,c("genus","specificepithet")])
+ 
+# This should be in the function argumentation.
+search_missing_taxa <- TRUE
+# Read my taxon list file using function argument PATH.
+MyTaxa <- read.delim(file = "./mytaxa.txt", header = FALSE, sep = "", col.names = c("Genus", "species"))
 
-# Search for the unique set of genus and species names in MyTaxa. If exist, do nothing. If not exist, get the position.\
-test$genus %in% MyTaxa$Genus
+# Conduct get row numbers of taxa from data_selected_sorted that can be found within MyTaxa.
+position <- which(data_selected_sorted[, "genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "specificepithet"] %in% MyTaxa[, "species"])
 
-for (row in length(data_selected_sorted$genus)) {
-#If the genus doesn't exist, take all rows of the genus name in test into vector.
-# position: rows that doesnot exist in MyTaxa
-position <- which(!data_selected_sorted$genus %in% MyTaxa$Genus)
-
-# if the genus exist, proceed to species comparison.  
-# unique combination of gen and sp, of which the gen exist in MyTaxa
-position <- which(!MyTaxa[, "Genus"] == data_selected_sorted[1, "genus"] & !MyTaxa[, "species"] == data_selected_sorted[1, "specificepithet"])
-
-# ? How to get row position within data_selected_sorted that has a gen and sp combination not in MyTaxa.
-MyTaxa[1, "Genus"] %in% data_selected_sorted[, "genus"] & MyTaxa[1, "species"] %in% data_selected_sorted[, "specificepithet"]
-
+# If search_missing_taxa argument is TRUE, reverse the previous search and produce row numbers of taxa that are missing from MyTaxa.
+if (search_missing_taxa == TRUE){
+  all_rows <- 1:nrow(data_selected_sorted)
+  position <- all_rows[!all_rows %in% position]
 }
 
-
-vector <- c()
-# search for the position of missing genus and species name combination
-position <- which(data_selected_sorted$genus == "Acernaspis" & data_selected_sorted$specificepithet == "orestes")
-vector <- c(vector, position)
-
-  
-
+# Remove the column of institutin code.
 data_selected_sorted$institutioncode <- NULL
+# Make a table.
 kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
   # Header arrangement
   add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
   # Italize Genus and species names.
   column_spec(column = c(4,5), italic = TRUE)%>%
-  row_spec(vector, color = "red")%>%
+  # Highlight the rows specified by position.
+  row_spec(position, color = "red")%>%
   # Group rows with institutional categories.
   pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
-}
-```
-```{r}
-# NULL
-for (Gen in 1:length(data_selected_sorted$genus)){
-  if (data_selected_sorted$genus[Gen] %in% MyTaxa$Genus){
-    data_selected_sorted$s[Gen] %in% MyTaxa$Genus
-  }
-}
-data_selected_sorted
-
-for (obj in 1:length(data_selected_vector)){
-  UnCodedSp_vector <- data_selected_vector[[obj]][["specificepithet"]] %in% MyTaxa$species
-  UnCodedSp_row <- which(UnCodedSp_vector==FALSE)
-}
 ```
 
 
