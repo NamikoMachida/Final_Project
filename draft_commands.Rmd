@@ -21,7 +21,7 @@ taxa list comparison
 ```{r}
 source("./function_final_project.R")
 # specify the path to my taxon file and set Search_Missing_Taxa TRUE if I want to find additional taxa in museum specimens.
-collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
+collection_search(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
 ```
 
 

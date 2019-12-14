@@ -58,7 +58,7 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
 
   # Make a table.
   if (length(position) >= 1){
-    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
+    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE, table.attr = "style = \"color: black;\"") %>%
       kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
       # Header arrangement
       add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
@@ -67,7 +67,7 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
       # Group rows with institutional categories.
       collapse_rows(columns = 1, valign = "top")
   }else{
-    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
+    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE, table.attr = "style = \"color: black;\"") %>%
       kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
       # Header arrangement
       add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
