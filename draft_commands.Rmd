@@ -1,41 +1,41 @@
 packages needed
 ```{r}
 install.packages("ridigbio")
-install.packages("dplyr")
 install.packages("knitr")
 install.packages("kableExtra")
-webshot::install_phantomjs()
 ```
 ```{r}
 library(ridigbio)
-library(dplyr)
 library(knitr)
 library(kableExtra)
 ```
 
 -------------------------------------------------------------------------------
+Simple search and make a table
 ```{r}
-#All rank search!
 source("./function_final_project.R")
-collection(Rank = "family", Taxon = "Phacopidae")
+collection_search(Rank = "family", Taxon = "Pterygometopidae")
 ```
 
 taxa list comparison
 ```{r}
 source("./function_final_project.R")
-compare_taxa(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
+# specify the path to my taxon file and set Search_Missing_Taxa TRUE if I want to find additional taxa in museum specimens.
+collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
 ```
 
 
 --------------------------------------------------------------------------
 [experiment] Breaking down compare_taxa function. Computation time trial.
 ```{r}
-  Search_Missing_Taxa <- TRUE
-  data <- idig_search_records(rq=list(family="Phacopidae"), fields = "all")
+  source("./function_final_project.R")
+  Search_Missing_Taxa <- FALSE
+  # get data from idigbio
+  data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
   
   # extract neccessary columns.
   col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
-  data_selected <- select(data, col_needed)
+  data_selected <- data[, col_needed]
   #sort by institutional code, genus, species.
   data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
   # delete rows if institutional code is NA.
@@ -43,10 +43,16 @@ compare_taxa(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Searc
   
   # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
   col_to_cap <- c("order","family","genus","country","stateprovince","county","formation")
-  data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
+  data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], c(1,2), cap_head)
+  # Capitalize age columns
+  col_to_cap_age <- c("earliestperiodorlowestsystem", "latestperiodorhighestsystem")
+  data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_age], c(1,2), cap_head_age)
   
+  Path <- NULL
+  position <- c()
+  if (!is.null(Path)){
   # Read my taxon list file using function argument PATH.
-  MyTaxa <- read.delim(file = "./mytaxa.txt", header = FALSE, sep = ",", col.names = c("Genus", "species"))
+  MyTaxa <- read.delim(file = Path, header = FALSE, sep = ",", col.names = c("Genus", "species"))
   # Conduct get row numbers of taxa from data_selected_sorted that can be found within MyTaxa.
   position <- which(data_selected_sorted[, "genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "specificepithet"] %in% MyTaxa[, "species"])
   # If Search_Missing_Taxa argument is TRUE, reverse the previous search and produce row numbers of taxa that are missing from MyTaxa.
@@ -54,23 +60,36 @@ compare_taxa(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Searc
     all_rows <- 1:nrow(data_selected_sorted)
     position <- all_rows[!all_rows %in% position]
   }
+}
+  
 
-kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
-    kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-    # Header arrangement
-    add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-    # Highlight the rows specified by position.
-    row_spec(position, color = "red")%>%
-    # Group rows with institutional categories.
-  collapse_rows(columns = 1, valign = "top")
+  # Make a table.
+  if (length(position) >= 1){
+    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
+      # Header arrangement
+      add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+      # Highlight the rows specified by position.
+      row_spec(position, color = "red")%>%
+      # Group rows with institutional categories.
+      collapse_rows(columns = 1, valign = "top")
+  }else{
+    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
+      kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
+      # Header arrangement
+      add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
+      # Group rows with institutional categories.
+      collapse_rows(columns = 1, valign = "top")
+  }
 ```
+
 
 
 
 ------------------------------------------------------------------------
 [experiments]
 ```{r}
-data <- idig_search_records(rq=list(genus=c("Acernaspis", "Ananaspis")), fields = "all")
+data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
 # extract neccessary columns.
 col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
 data_selected <- select(data, col_needed)
@@ -79,25 +98,13 @@ data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_
 # delete rows if institutional code is NA.
 data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
 
-# make a list of institution codes.
-# remove na value
-inst_code_list <- unique(data_selected_sorted$institutioncode)
-inst_code_list <- na.omit(inst_code_list)
-  
-# make empty vectors
-row_range_vector <- c()
-# get # of rows for each institution, and append it to the previous vector.
-for (i in 1:length(inst_code_list)){
-row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
-row_range_vector <- c(row_range_vector, row_by_inst)
-}
-# name the vector element with institutional names.
-names(row_range_vector) <- inst_code_list
 
 # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
 col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
-data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
-
+data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], c(1,2), cap_head)
+# Capitalize age columns
+col_to_cap_age <- c("earliestperiodorlowestsystem", "latestperiodorhighestsystem")
+data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_age], c(1,2), cap_head_age)
  
 # This should be in the function argumentation.
 search_missing_taxa <- TRUE
@@ -113,79 +120,16 @@ if (search_missing_taxa == TRUE){
   position <- all_rows[!all_rows %in% position]
 }
 
-# Remove the column of institutin code.
-data_selected_sorted$institutioncode <- NULL
 # Make a table.
-kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
+kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
   # Header arrangement
-  add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-  # Italize Genus and species names.
-  column_spec(column = c(4,5), italic = TRUE)%>%
+  add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
   # Highlight the rows specified by position.
   row_spec(position, color = "red")%>%
   # Group rows with institutional categories.
-  pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
+  collapse_rows(columns = 1, valign = "top")
 ```
-
-
-
-------------------------------------------------------------------------------
-[experiment: treat data as dataframe (not as a list)] : SUCCESS!
-```{r}
-source("./function_final_project.R")
-
-data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
-
-# extract neccessary columns.
-col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
-data_selected <- select(data, col_needed)
-#sort by institutional code, genus, species.
-data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
-# delete rows if institutional code is NA.
-data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
-
-# make a list of institution codes.
-# remove na value
-inst_code_list <- unique(data_selected_sorted$institutioncode)
-inst_code_list <- na.omit(inst_code_list)
-  
-# make empty vectors
-row_range_vector <- c()
-# get # of rows for each institution, and append it to the previous vector.
-for (i in 1:length(inst_code_list)){
-row_by_inst <- nrow(data_selected_sorted[data_selected_sorted$institutioncode==inst_code_list[i],])
-row_range_vector <- c(row_range_vector, row_by_inst)
-}
-# name the vector element with institutional names.
-names(row_range_vector) <- inst_code_list
-
-
-
-# Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
-col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
-data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], 2, cap_head)
-
-
-# Make a table
-data_selected_sorted$institutioncode <- NULL
-kable(data_selected_sorted, format = "html", col.names = c("Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-  # Header arrangement
-  add_header_above(c(" " = 1, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-  # Italize Genus and species names.
-  column_spec(column = c(4,5), italic = TRUE)%>%
-  # Group rows with institutional categories.
-  pack_rows(index = row_range_vector, label_row_css = "background-color: Gray; color: White;")
-```
-
-
-
-
-
-
-
-
 
 # this works with problem (in pdf.) May be it's not good to output as PDF.
 ```{r}
@@ -203,15 +147,4 @@ for (i in 1:length(inst_code_list)){
 kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
   kable_styling("striped") %>%
   save_kable("./table.pdf")
-```
-
-
-
-
-How about paleobioDB's tool to map paleo map?
-```{r}
-install.packages("paleobioDB")
-```
-```{r}
-library(paleobioDB)
 ```
