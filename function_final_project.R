@@ -19,7 +19,20 @@ cap_head_age <- function(string) {
 # General taxon search and Species list comparison
 # Path can be a path to a taxon file of .CSV or comma delimited text file.
 # Taxon argument accept multiple taxa as vector.
-collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE) {  
+collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE) {
+  if (!is.character(Rank)){
+    stop("Rank must be a character string (e.g. Rank = \"genus\").")
+  }
+  if (!is.character(Taxon)){
+    stop("Taxon must be a character string (e.g. Taxon = \"Acernaspis\").")
+  }
+  if (any(strsplit(Rank, "")[[1]] == toupper(strsplit(Rank, "")[[1]]))){
+    stop("Rank must be in lower case characters.")
+  }
+  if (!is.logical(Search_Missing_Taxa)){
+    stop("Search_Missing_Taxa must be either TRUE/FALSE. Default is FALSE.")
+  }
+  
   # get data from idigbio
   idiglist <- list(Taxon)
   names(idiglist) <- c(Rank)

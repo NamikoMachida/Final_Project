@@ -9,19 +9,26 @@ library(ridigbio)
 library(knitr)
 library(kableExtra)
 ```
+----------------------------------------------------------------------------------
+Rank: taxonomic rank, all lowercases.
+Taxon: taxonomic name(s). Can accept multiple values as a vector (e.g. c("Acernaspis, Ananaspis"))
+Path: A path to your own taxon list file. Taxon list must comprise two columns, genus and species, with "," as delimiter and without header. The file format can be either .CSV or .txt.
+Search_Missing_Taxa: A logical argument whether you want to search for specimens of taxa that are missing from your taxon list, or those in your list. If it is TRUE, the function will search for the specimens of missing taxa. Default is FALSE.
+
+
 
 -------------------------------------------------------------------------------
 Simple search and make a table
 ```{r}
 source("./function_final_project.R")
-collection_search(Rank = "family", Taxon = "Pterygometopidae")
+collection_search(Rank = "genus", Taxon = "Acernaspis")
 ```
 
 taxa list comparison
 ```{r}
 source("./function_final_project.R")
 # specify the path to my taxon file and set Search_Missing_Taxa TRUE if I want to find additional taxa in museum specimens.
-collection_search(Rank = "family", Taxon = "Phacopidae", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
+collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
 ```
 
 
