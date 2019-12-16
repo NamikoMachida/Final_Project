@@ -1,23 +1,29 @@
-packages needed
-```{r}
+__Specimen Search within Natural History Museums__   
+________________________________________________________________   
+Please install the following three packages on your computer and library them.
+```
 install.packages("ridigbio")
 install.packages("knitr")
 install.packages("kableExtra")
-```
-```{r}
+```   
+```{r library}
 library(ridigbio)
 library(knitr)
 library(kableExtra)
+```   
+
+________________________________________________________________   
+Function Usage
 ```
-----------------------------------------------------------------------------------
+collection_search(Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)
+```   
+Arguments
 Rank: taxonomic rank, all lowercases.
 Taxon: taxonomic name(s). Can accept multiple values as a vector (e.g. c("Acernaspis, Ananaspis"))
 Path: A path to your own taxon list file. Taxon list must comprise two columns, genus and species, with "," as delimiter and without header. The file format can be either .CSV or .txt.
 Search_Missing_Taxa: A logical argument whether you want to search for specimens of taxa that are missing from your taxon list, or those in your list. If it is TRUE, the function will search for the specimens of missing taxa. Default is FALSE.
 
-
-
--------------------------------------------------------------------------------
+________________________________________________________________   
 Simple search and make a table
 ```{r}
 source("./function_final_project.R")
@@ -25,11 +31,37 @@ collection_search(Rank = "genus", Taxon = "Acernaspis")
 ```
 
 taxa list comparison
+In here, a comparison with my taxonlist is conducted. The taxon list is named as mytaxa.txt, which is stored in this directory.
 ```{r}
 source("./function_final_project.R")
 # specify the path to my taxon file and set Search_Missing_Taxa TRUE if I want to find additional taxa in museum specimens.
-collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.csv", Search_Missing_Taxa = TRUE)
+collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 --------------------------------------------------------------------------
