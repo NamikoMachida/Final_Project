@@ -1,42 +1,42 @@
-__Specimen Search within Natural History Museums__   
-________________________________________________________________   
-Please install the following three packages on your computer and library them.
+Search for Natural History Specimens in idigbio Database   
+-------------------------------------------------------------------------------------------------------------     
+
+### Installing
+Please install the following three packages on your computer and library them before running the codes below.   
 ```
 install.packages("ridigbio")
 install.packages("knitr")
 install.packages("kableExtra")
 ```   
-```{r library}
+```{r library, include=FALSE}
 library(ridigbio)
 library(knitr)
 library(kableExtra)
 ```   
 
-________________________________________________________________   
-Function Usage
+
+### Function: collection_search   
 ```
 collection_search(Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)
 ```   
-Arguments
-Rank: taxonomic rank, all lowercases.
-Taxon: taxonomic name(s). Can accept multiple values as a vector (e.g. c("Acernaspis, Ananaspis"))
-Path: A path to your own taxon list file. Taxon list must comprise two columns, genus and species, with "," as delimiter and without header. The file format can be either .CSV or .txt.
-Search_Missing_Taxa: A logical argument whether you want to search for specimens of taxa that are missing from your taxon list, or those in your list. If it is TRUE, the function will search for the specimens of missing taxa. Default is FALSE.
+See [README.md](https://github.com/NamikoMachida/Final_Project/blob/Namiko/README.md) for the above arguments' details.   
 
-________________________________________________________________   
-Simple search and make a table
-```{r}
+
+### Examples of function usage   
+* Basic specimen search and table visualization   
+```{r Basic search, echo=TRUE}
 source("./function_final_project.R")
-collection_search(Rank = "genus", Taxon = "Acernaspis")
-```
+collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
+```   
 
-taxa list comparison
-In here, a comparison with my taxonlist is conducted. The taxon list is named as mytaxa.txt, which is stored in this directory.
-```{r}
+
+
+* Specimen search + Species list comparison  
+In here, a species level comparison between downloaded specimen data and a list of species of my interest. My species list is named as mytaxa.txt, which is stored in the same .Rproject directory. The argument of Search_Missing_Taxa is set as TRUE to find any specimen infomation that can expand current taxonomic coverage of my data.   
+```{r Species comparison, echo=TRUE}
 source("./function_final_project.R")
-# specify the path to my taxon file and set Search_Missing_Taxa TRUE if I want to find additional taxa in museum specimens.
-collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
-```
+collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
+```   
 
 
 
@@ -48,142 +48,3 @@ collection_search(Rank = "genus", Taxon = "Acernaspis", Path = "./mytaxa.txt", S
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------------------------------
-[experiment] Breaking down compare_taxa function. Computation time trial.
-```{r}
-  source("./function_final_project.R")
-  Search_Missing_Taxa <- FALSE
-  # get data from idigbio
-  data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
-  
-  # extract neccessary columns.
-  col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
-  data_selected <- data[, col_needed]
-  #sort by institutional code, genus, species.
-  data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
-  # delete rows if institutional code is NA.
-  data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
-  
-  # Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
-  col_to_cap <- c("order","family","genus","country","stateprovince","county","formation")
-  data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], c(1,2), cap_head)
-  # Capitalize age columns
-  col_to_cap_age <- c("earliestperiodorlowestsystem", "latestperiodorhighestsystem")
-  data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_age], c(1,2), cap_head_age)
-  
-  Path <- NULL
-  position <- c()
-  if (!is.null(Path)){
-  # Read my taxon list file using function argument PATH.
-  MyTaxa <- read.delim(file = Path, header = FALSE, sep = ",", col.names = c("Genus", "species"))
-  # Conduct get row numbers of taxa from data_selected_sorted that can be found within MyTaxa.
-  position <- which(data_selected_sorted[, "genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "specificepithet"] %in% MyTaxa[, "species"])
-  # If Search_Missing_Taxa argument is TRUE, reverse the previous search and produce row numbers of taxa that are missing from MyTaxa.
-  if (Search_Missing_Taxa == TRUE){
-    all_rows <- 1:nrow(data_selected_sorted)
-    position <- all_rows[!all_rows %in% position]
-  }
-}
-  
-
-  # Make a table.
-  if (length(position) >= 1){
-    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
-      kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-      # Header arrangement
-      add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-      # Highlight the rows specified by position.
-      row_spec(position, color = "red")%>%
-      # Group rows with institutional categories.
-      collapse_rows(columns = 1, valign = "top")
-  }else{
-    kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm."), align = "l", row.names = FALSE) %>%
-      kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-      # Header arrangement
-      add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-      # Group rows with institutional categories.
-      collapse_rows(columns = 1, valign = "top")
-  }
-```
-
-
-
-
-------------------------------------------------------------------------
-[experiments]
-```{r}
-data <- idig_search_records(rq=list(genus="Acernaspis"), fields = "all")
-# extract neccessary columns.
-col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "county", "stateprovince", "formation")
-data_selected <- select(data, col_needed)
-#sort by institutional code, genus, species.
-data_selected_sorted <- data_selected[order(data_selected$institutioncode, data_selected$genus, data_selected$specificepithet),]
-# delete rows if institutional code is NA.
-data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
-
-
-# Capitalise certain columns (Order, Family, Genus, Country, County, Fm.)
-col_to_cap <- c("order","family","genus","country","county","stateprovince","formation")
-data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], c(1,2), cap_head)
-# Capitalize age columns
-col_to_cap_age <- c("earliestperiodorlowestsystem", "latestperiodorhighestsystem")
-data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_age], c(1,2), cap_head_age)
- 
-# This should be in the function argumentation.
-search_missing_taxa <- TRUE
-# Read my taxon list file using function argument PATH.
-MyTaxa <- read.delim(file = "./mytaxa.txt", header = FALSE, sep = "", col.names = c("Genus", "species"))
-
-# Conduct get row numbers of taxa from data_selected_sorted that can be found within MyTaxa.
-position <- which(data_selected_sorted[, "genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "specificepithet"] %in% MyTaxa[, "species"])
-
-# If search_missing_taxa argument is TRUE, reverse the previous search and produce row numbers of taxa that are missing from MyTaxa.
-if (search_missing_taxa == TRUE){
-  all_rows <- 1:nrow(data_selected_sorted)
-  position <- all_rows[!all_rows %in% position]
-}
-
-# Make a table.
-kable(data_selected_sorted, format = "html", col.names = c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "County", "State", "Fm."), align = "l", row.names = FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-  # Header arrangement
-  add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-  # Highlight the rows specified by position.
-  row_spec(position, color = "red")%>%
-  # Group rows with institutional categories.
-  collapse_rows(columns = 1, valign = "top")
-```
-
-# this works with problem (in pdf.) May be it's not good to output as PDF.
-```{r}
-dataframe_list <- list()
-for (i in 1:length(inst_code_list)){
-  data_fortab <- data_selected
-  inst_code <- inst_code_list[i]
-  
-  data_fortab <- data_selected[data_selected$institutioncode==inst_code, ]
-  data_fortab$institutioncode <- NULL
-  dataframe_list <- append(dataframe_list, list(data_fortab))
-  names(dataframe_list)[i] <- paste0("data_fortab",i)
-}
-
-kable(dataframe_list, format = "html", col.names = c("ColID", "Order", "Fam", "Gen", "Sp.", "eAge", "lAge", "Country", "County", "State", "Fm."), align = "l") %>%
-  kable_styling("striped") %>%
-  save_kable("./table.pdf")
-```
