@@ -2,7 +2,7 @@
 # Downloads biologic museum specimen information from idigbio database and displays the result as a table.
 # A comparison with user's species list can also be conducted.
 collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE) {
-  # Produce error messages if inappropriate values are entered as arguments.
+  # 1. Production of error messages: Output error messages if inappropriate values are entered in the arguments.
   if (!is.character(Rank)){
     stop("Rank must be a character string (e.g. Rank = \"genus\").")
   }
@@ -16,11 +16,12 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
     stop("Search_Missing_Taxa must be either TRUE/FALSE. Default is FALSE.")
   }
   
-  # Get data from idigbio database.
+  # 2. Downloading data from idigbio  
   idiglist <- list(Taxon)
   names(idiglist) <- c(Rank)
   data <- idig_search_records(rq=idiglist, fields = "all")
   
+  # 3. Data subsetting and sorting
   # Extract neccessary columns.
   col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
   data_selected <- data[, col_needed]
@@ -29,6 +30,7 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
   # Remove rows whose institutional code is NA.
   data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$institutioncode), ]
   
+  # 4. Text value capitalization
   # Capitalise first letter of specific columns (i.e. Order, Family, Genus, Country, County, Fm.).
   col_to_cap <- c("order","family","genus","country","stateprovince","county","formation")
   data_selected_sorted[,col_to_cap] <- apply(data_selected_sorted[,col_to_cap], c(1,2), cap_head)
@@ -36,7 +38,7 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
   col_to_cap_age <- c("earliestperiodorlowestsystem", "latestperiodorhighestsystem")
   data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_age], c(1,2), cap_head_age)
   
-  
+  # 5. Species comparison
   # Conduct species comparison if required by the user.
   position <- c()
   if (!is.null(Path)){
@@ -51,6 +53,7 @@ collection_search <- function (Rank, Taxon, Path = NULL, Search_Missing_Taxa = F
     }
   }
   
+  # 6. Table production
   # Make a table. If the species comparison was conducted above, use table_SpComparison function to highlight rows specifed by `position` vector. 
   if (length(position) >= 1){
     table_SpComparison(data = data_selected_sorted, Position = position)
@@ -69,6 +72,9 @@ cap_head <- function(string) {
   paste(text, sep = "", collapse = " ")
 }
 
+
+
+
 # capitalize function for age columns. Only geologic periods will be capitalised and prefixes of "early", "middle", "late" will remain in lower case.
 cap_head_age <- function(string) {
   text <- strsplit(string, " ")[[1]]
@@ -76,6 +82,8 @@ cap_head_age <- function(string) {
   substring(text[text %in% periods], 1,1) <- toupper(substring(text[text %in% periods], 1,1))
   paste(text, sep = "", collapse = " ")
 }
+
+
 
 
 simple_table <- function(data){
@@ -87,6 +95,8 @@ simple_table <- function(data){
     collapse_rows(columns = 1, valign = "top")%>%
     scroll_box(width = "100%", height = "500px")
 }
+
+
 
 
 table_SpComparison <- function(data, Position){
