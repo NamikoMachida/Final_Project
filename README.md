@@ -1,5 +1,5 @@
 # __Search Natural History Specimens in idigbio Database__   
-Specimen based research in biology or paleontology requires rigorous work in searching for relevant specimens stored in many natural history museums/institutions worldwide. To encourage researchers to utilize their collections, many museums/institutions have their own collection databases that are open to the public, however, it is still time-consuming and hard to find out relevant specimens from separately organized databases. A recently developed online database [idigbio](https://www.idigbio.org/) compiles specimen information from multiple museums, enabling us to conduct inter-museum collection searches. Here, a new function that utilizes the `ridigbio` package is created to flexibly accommodate users’ needs in conducting specimen searches and help them identify relevant museums for their research interest.   
+Specimen based research in biology or paleontology requires rigorous work in searching for relevant specimens stored in many natural history museums/institutions worldwide. To encourage researchers to utilize their collections, many museums/institutions have their own collection databases that are open to the public, however, it is still time-consuming and hard to find out relevant specimens from separately organized databases. A recently developed online database [idigbio](https://www.idigbio.org/) compiles specimen information from multiple museums, enabling us to conduct inter-museum collection searches. Here, a new function that utilizes the `ridigbio` package is created to flexibly accommodate users’ needs in conducting specimen searches and help the users to identify museums that have relevant specimens for their research interest.   
 
 
 ### __1. Getting Started__   
@@ -25,14 +25,9 @@ library(kableExtra)
 ```   
 
 
-### __2. Language__   
+### __2. collection_search: Function Description__  
 ________________________________________________________________   
-All procedures from downloading the data to visualizing as a table are done in R.   
-
-
-### __3. collection_search: Function Description__  
-________________________________________________________________   
-A new function `collection_search` is created and stored in [functions.R](https://github.com/NamikoMachida/Final_Project/blob/master/functions.R) file in the same repository. To use the function, please source it from the file.
+A new function `collection_search` is created and stored in [functions.R](https://github.com/NamikoMachida/Final_Project/blob/master/functions.R) file in the same repository. To use this function, please source it from the file after cloning this repository to your computer.
 ```
 source("./functions.R")
 ```   
@@ -56,25 +51,34 @@ Kainops,raymondi
 
 #### __Examples__   
 These are basic argument patterns of the `collection_search` function.   
+
+* Search specimen information for a single taxaonomic group   
 ```
-# To search specimen information of a trilobite family Phacopidae.
+# Example: trilobite family Phacopidae
+
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Phacopidae")
 ```   
+* Search specimen information across multiple groups   
+By entering multiple taxonomic names to `Taxon` argument as a charcter vector, you can collect specimen information for those groups simaltaneously. Please note that all the `Taxon` input must belong to the same taxonomic rank.   
 ```
-# To search specimen information of three phacopid genera (e.g., "Acernaspis", "Ananaspis", "Kainops").
+# Example: trilobite genera Acernaspis, Ananaspis, and Kainops
+
 source("./functions.R")
 collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
 ```   
+* Find specimens of species not included in my current species list   
+This is usefull when you are searching for any acceccible specimens that can potentially enhance taxonomic coverage of your dataset (e.g., character matrix in phylogenetic analyses). Any "missing taxa" will be highlighted in the output table. Conversely, you can highlight specimens of species in your current species list by simply leaving `Search_Missing_Taxa` as FALSE.   
 ```
-# To find specimens of any taxa within trilobite family Acastidae that are missing from my own species list. 
+# Example: trilobite family Acastidae, with a result of species comparison
+
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-To see examples of their outputs, please clone this repository and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.Rmd) or go to [collection_search-demo.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.html) in which the function does some demonstrations.   
+To see examples of their outputs, please clone this repository locally and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.Rmd) or go to [collection_search-demo.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.html) in which the function does some demonstrations.   
 
 
-### __4. collection_search: Function Breakdown__   
+### __3. collection_search: Function Breakdown__   
 ________________________________________________________________   
 Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./functions.R`.   
 
@@ -99,7 +103,7 @@ if (any(strsplit(rank, "")[[1]] == toupper(strsplit(rank, "")[[1]]))){
 ```  
 
 ##### __2. Downloading data from idigbio__   
-The main function that downloads museum specimen information from the idigbio database is `idig_search_records(rq, fields)`. `rq` is a record query argument in a nested list format that takes taxonomic names as list elements and taxonomic rank as the name of the list. In here, the character vector `Taxon` is made into a list called `idiglist` and named as `rank` input. `fields` is set as "all" to download all the available data from the database.
+The main function that downloads museum specimen information from the idigbio database is `idig_search_records(rq, fields)`. `rq` is a record query argument in a nested list format that takes taxonomic names as list elements and taxonomic rank as the name of the list. In here, the character vector `Taxon` is made into a list called `idiglist` and named as `rank` input. `fields` is set as "all" to download all the available data from the database.   
 ```
 idiglist <- list(Taxon)
 names(idiglist) <- c(rank)
@@ -107,13 +111,13 @@ data <- idig_search_records(rq=idiglist, fields = "all")
 ```   
 
 #### __3. Data subsetting and sorting__   
-First, 12 columns that cover information of institutions, specimen IDs, taxonomic classifications, geologic ages, and specimen localities are extracted from the raw data downloaded in the previous section. The newly subsetted data is named as `data_selected`. Column names of the `data_selected` are converted into more user-friendly names.
+First, 12 columns that cover information of institutions, specimen IDs, taxonomic classifications, geologic ages, and specimen localities are extracted from the raw data downloaded in the previous section. The newly subsetted data is named as `data_selected`. Column names of the `data_selected` are converted into more user-friendly names.   
 ```
 col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
 data_selected <- data[, col_needed]
 colnames(data_selected) <- c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm.")
 ```   
-Then, hierarchical sorting is conducted. `order()` function in row argument rearranges the rows of `data_selected` based on the values in "institutioncode", "genus", and "specificepithet" columns with a hierarchical prioritization. The subsetted data is now named as `data_selected_sorted`. In this way, the specimen data is systematically grouped by institutions, genus, and species names.  
+Then, hierarchical sorting is conducted. `order()` function in row argument rearranges the rows of `data_selected` based on the values in "InstCode", "Genus", and "species" columns with a hierarchical prioritization. The subsetted data is now named as `data_selected_sorted`. In this way, the specimen data is systematically grouped by institutions, genus, and species names.  
 ```
 data_selected_sorted <- data_selected[order(data_selected$InstCode, data_selected$Genus, data_selected$species),]
 ```   
@@ -145,7 +149,7 @@ cap_head_age <- function(string) {
   paste(text, collapse = " ")
 }
 ```  
-In section 4 of the `collection_search` function, `cap_head` is applied to columns regarding biologic classifications down to the genus level and columns of locality information. `cap_head_age` is applied to columns of the earliest and latest geologic period.
+In section 4 of the `collection_search` function, `cap_head` is applied to columns regarding biologic classifications down to the genus level and columns of locality information. `cap_head_age` is applied to columns of the earliest and latest geologic period.  
 ```
 # Section 4 of collection_search function.
 
@@ -158,7 +162,7 @@ data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_
 
 #### __5. Species comparison__
 If the user enters a file path into the `Path` argument, which means `!is.null(Path)` is TURE, a species comparison between the downloaded data and user's own species list will be conducted. The user's species list is read and set as a data.frame called `MyTaxa` with column names of "Genus" and "species". Then, row numbers of genus and species combinations in `data_selected_sorted`, that match those of `MyTaxa`, are identified and stored in a vector called `position`. If the user defines `Search_Missing_Taxa` argument as "TRUE", the row numbers in the `position` vector will be reversed so that the `position` vector has row numbers of genus and species combinations that are missing from `MyTaxa` list.
-With a nested structure of the above two if statements, the user can look up specific taxa in his/her species list or search for any specimens that are missing from his/her list.
+With a nested structure of the above two if statements, the users can look up specific taxa in their species list or search for any specimens that are missing from their list.   
 ```
 position <- c()
 if (!is.null(Path)){
@@ -193,7 +197,7 @@ simple_table <- function(data){
     collapse_rows(columns = 1, valign = "top")
 }
 ``` 
-`table_SpComparison` function has the exact same lines as those of `simple_table` function except having a line of `row_spec(Position, color = "red")`. With this additional formatting, in which the `Position` is a numeric vector of row numbers, specified rows can be highlighted in red in the output table.
+`table_SpComparison` function has the exact same lines as those of `simple_table` function except having a line of `row_spec(Position, color = "red")`. With this additional formatting, in which the `Position` is a numeric vector of row numbers, specified rows can be highlighted in red in the output table.   
 ```
 # table_SpComparison function
 
@@ -206,11 +210,21 @@ table_SpComparison <- function(data, Position){
 }
 ```  
 
-
-### __5. Deployment__   
+### __4. Built With__   
 ________________________________________________________________________________   
+* [R](https://www.r-project.org/)  
+* [ridigbio](https://cran.r-project.org/web/packages/ridigbio/index.html)  
+* [knitr](https://cran.r-project.org/web/packages/knitr/index.html)  
+* [kableExtra](https://cran.r-project.org/web/packages/kableExtra/index.html)  
 
-
-### __6. Author__
+### __5. Authors__   
 ________________________________________________________________________________   
-__Namiko Machida__ -- [NamikoMachida](https://github.com/NamikoMachida)
+__Namiko Machida__ -Most work- [NamikoMachida](https://github.com/NamikoMachida)  
+__Amy Hessl__ -Advisor-  
+
+
+### __6. Acknowledgments__   
+________________________________________________________________________________   
+* Hat tip to anyone who's code was used
+* Inspiration
+* etc

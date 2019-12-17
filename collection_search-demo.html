@@ -386,7 +386,7 @@ install.packages(&quot;kableExtra&quot;)</code></pre>
 <div id="function-collection_search" class="section level3">
 <h3>Function: collection_search</h3>
 <pre><code>collection_search(Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)</code></pre>
-<p>See <a href="https://github.com/NamikoMachida/Final_Project/blob/Namiko/README.md">README.md</a> for the arguments’ details of this function.</p>
+<p>See <a href="https://github.com/NamikoMachida/Final_Project/blob/master/README.md">README.md</a> for the arguments’ details of this function.</p>
 </div>
 <div id="examples-of-function-usage" class="section level3">
 <h3>Examples of function usage</h3>
@@ -395,7 +395,7 @@ install.packages(&quot;kableExtra&quot;)</code></pre>
 </ul>
 <pre class="r"><code>source(&quot;./functions.R&quot;)
 collection_search(rank = &quot;genus&quot;, Taxon = c(&quot;Acernaspis&quot;, &quot;Ananaspis&quot;, &quot;Kainops&quot;))</code></pre>
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:700px; overflow-x: scroll; width:100%; ">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
 <table style="color: black; font-size: 12px; width: auto !important; " class="table table-striped table-condensed">
 <thead>
 <tr>
@@ -6477,11 +6477,11 @@ Whitehead Fm
 </div>
 <ul>
 <li>Specimen search + Species list comparison<br />
-In here, a species-level comparison between downloaded specimen data and a list of species of my interest. My species list is named as mytaxa.txt, which is stored in the same repository. The argument of Search_Missing_Taxa is set as TRUE to find any specimen information that can expand current taxonomic coverage of my data.</li>
+In here, a species-level comparison between the downloaded specimen data and user’s list of species. The user’s species list is named as mytaxa.txt, which is stored in the same repository. The argument of <code>Search_Missing_Taxa</code> is set as TRUE to find any specimen information that can potentially expand user’s current taxonomic coverage.</li>
 </ul>
 <pre class="r"><code>source(&quot;./functions.R&quot;)
 collection_search(rank = &quot;family&quot;, Taxon = &quot;Acastidae&quot;, Path = &quot;./mytaxa.txt&quot;, Search_Missing_Taxa = TRUE)</code></pre>
-<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:700px; overflow-x: scroll; width:100%; ">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
 <table style="color: black; font-size: 12px; width: auto !important; " class="table table-striped table-condensed">
 <thead>
 <tr>
