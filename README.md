@@ -32,9 +32,9 @@ All procedures from downloading the data to visualizing as a table are done in R
 
 ### __3. collection_search: Function Description__  
 ________________________________________________________________   
-A new function `collection_search` is created and stored in .R file in the .Rproject directory. To use the function, please sorce it from the file.
+A new function `collection_search` is created and stored in [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R) file in the same repository. To use the function, please sorce it from the file.
 ```
-source("./function_final_project.R")
+source("./functions.R")
 ```   
 
 #### __Function Usage__   
@@ -58,27 +58,25 @@ Kainops,raymondi
 This is a basic argument patterns of the `collection_search` function.   
 ```
 # To search specimen information of a trilobite family Phacopidae
-source("./function_final_project.R")
+source("./functions.R")
 collection_search(rank = "family", Taxon = "Phacopidae")
 ```   
 ```
 # To search specimen information of three phacopid genera ("Acernaspis", "Ananaspis", "Kainops").
-source("./function_final_project.R")
+source("./functions.R")
 collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
 ```   
 ```
 # To find specimens of any taxa within trilobite family Acastidae that are missing from my own species list. 
-source("./function_final_project.R")
+source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-To see examples of their outputs, please go to .Rmd or html in which the function does demonstrations.
-* [draft_commands.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/draft_commands.Rmd)
-* [html]() 
+To see examples of their outputs, please go to [collection_search(demo).Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search(demo).Rmd) or [collection_search(demo).html]() in which the function does demonstrations.   
 
 
 ### __4. collection_search: Function Breakdown__   
 ________________________________________________________________   
-Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./function_final_project.R`.   
+Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./functions.R`.   
 
 ##### __1. Production of error messages__   
 This section produces error messages if inappropriate values are entered in the arguments. Since the `rank` and `Taxon` arguments must be in character values and the `Search_Missing_Taxa` must be in logical expression, combinations of "logical NOT operator" `!` and `is.character()` or `is.logical()` functions are used in if statements.   
@@ -125,7 +123,7 @@ data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$InstCod
 ```   
 
 #### __4. Text value capitalization__
-Since all the downloaded data comes in lowercases, case convertion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of .R file). 
+Since all the downloaded data comes in lowercases, case convertion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R)). 
 `cap_head` function works to capitalize the first letters of all words in a character string. In here, `text <- strsplit(string, "")[[1]]` splits `string` object by words and convert them into a character vector called `text`. Then, `substring(text, 1,1)` takes all the first letters from `text` vector, which will be converted into uppercase letters by `toupper()` function. Finally, `paste(text, collapse = " ")` outputs the case converted elements of `text` vector in space separated format. 
 ```
 # cap_head function
@@ -174,7 +172,7 @@ if (!is.null(Path)){
 ```   
 
 #### __6. Table production__  
-As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of .R file). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
+As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R)). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
 ```
 # Section 6 of collection_search funciton.
 
