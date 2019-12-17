@@ -97,8 +97,7 @@ simple_table <- function(data){
     # Header arrangement
     add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
     # Group rows with institutional categories.
-    collapse_rows(columns = 1, valign = "top")%>%
-    scroll_box(width = "100%", height = "700px")
+    collapse_rows(columns = 1, valign = "top")
 }
 
 
@@ -113,6 +112,5 @@ table_SpComparison <- function(data, Position){
     # Highlight the rows specified by Position argument.
     row_spec(Position, color = "red")%>%
     # Group rows with institutional categories.
-    collapse_rows(columns = 1, valign = "top")%>%
-    scroll_box(width = "100%", height = "700px")
+    collapse_rows(columns = 1, valign = "top")
 }

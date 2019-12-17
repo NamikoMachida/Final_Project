@@ -57,12 +57,12 @@ Kainops,raymondi
 #### __Examples__   
 These are basic argument patterns of the `collection_search` function.   
 ```
-# To search specimen information of a trilobite family Phacopidae
+# To search specimen information of a trilobite family Phacopidae.
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Phacopidae")
 ```   
 ```
-# To search specimen information of three phacopid genera ("Acernaspis", "Ananaspis", "Kainops").
+# To search specimen information of three phacopid genera (e.g., "Acernaspis", "Ananaspis", "Kainops").
 source("./functions.R")
 collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
 ```   
@@ -210,5 +210,7 @@ table_SpComparison <- function(data, Position){
 ### __5. Deployment__   
 ________________________________________________________________________________   
 
+
 ### __6. Author__
+________________________________________________________________________________   
 __Namiko Machida__ -- [NamikoMachida](https://github.com/NamikoMachida)
