@@ -71,7 +71,7 @@ collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-To see examples of their outputs, please clone this repository and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo.Rmd) or go to [collection_search-demo-.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo-.html) in which the function does some demonstrations.   
+To see examples of their outputs, please clone this repository and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo.Rmd) or go to [collection_search-demo.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo.html) in which the function does some demonstrations.   
 
 
 ### __4. collection_search: Function Breakdown__   
