@@ -1,6 +1,6 @@
 # Function: collection_search
-# Downloads specimen information of natural history museums/institutions from idigbio database and visualise the data as a formatted table.
-# A species level comparison with user specified taxonomic list can also be conducted.
+# Downloads specimen information of natural history museums/institutions from idigbio database and visualize the data as a formatted table.
+# A species-level comparison with a user-specified taxonomic list can also be conducted.
 
 collection_search <- function (rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE) {
   # 1. Production of error messages: Output error messages if inappropriate values are entered in the arguments.
@@ -23,10 +23,10 @@ collection_search <- function (rank, Taxon, Path = NULL, Search_Missing_Taxa = F
   data <- idig_search_records(rq=idiglist, fields = "all")
   
   # 3. Data subsetting and sorting
-  # Extract neccessary columns.
+  # Extract necessary columns.
   col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
   data_selected <- data[, col_needed]
-  # Name the columns with user friendly names.
+  # Name the columns with user-friendly names.
   colnames(data_selected) <- c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm.")
   # Conduct hierarchical sorting by institutional code, genus, and species.
   data_selected_sorted <- data_selected[order(data_selected$InstCode, data_selected$Genus, data_selected$species),]
@@ -45,7 +45,7 @@ collection_search <- function (rank, Taxon, Path = NULL, Search_Missing_Taxa = F
   # Conduct species comparison if intended by the user.
   position <- c()
   if (!is.null(Path)){
-    # Read user's taxon list.
+    # Read the user's taxon list.
     MyTaxa <- read.delim(file = Path, header = FALSE, sep = ",", col.names = c("Genus", "species"))
     # Get row numbers from data_selected_sorted that have the same genus and species combination as in MyTaxa.
     position <- which(data_selected_sorted[, "Genus"] %in% MyTaxa[, "Genus"] & data_selected_sorted[, "species"] %in% MyTaxa[, "species"])
@@ -98,21 +98,21 @@ simple_table <- function(data){
     add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
     # Group rows with institutional categories.
     collapse_rows(columns = 1, valign = "top")%>%
-    scroll_box(width = "100%", height = "500px")
+    scroll_box(width = "100%", height = "700px")
 }
 
 
 
 # Function: table_SpComparison
-# Visualize data in table format with highliting certain rows.
+# Visualize data in table format with highlighting certain rows.
 table_SpComparison <- function(data, Position){
   kable(data, format = "html", align = "l", row.names = FALSE, table.attr = "style = \"color: black;\"") %>%
     kable_styling(bootstrap_options = c("striped", "condensed"), full_width = F, position = "left", font_size = 12, fixed_thead = T)%>%
-    # Header arrangement
+    # Header arrangement.
     add_header_above(c(" " = 2, "Classification" = 4, "Age" = 2, "Locality" = 4))%>%
-    # Highlight the rows specified by position.
+    # Highlight the rows specified by Position argument.
     row_spec(Position, color = "red")%>%
     # Group rows with institutional categories.
     collapse_rows(columns = 1, valign = "top")%>%
-    scroll_box(width = "100%", height = "500px")
+    scroll_box(width = "100%", height = "700px")
 }
