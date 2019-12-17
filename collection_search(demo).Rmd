@@ -19,13 +19,13 @@ library(kableExtra)
 ```
 collection_search(Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)
 ```   
-See [README.md](https://github.com/NamikoMachida/Final_Project/blob/Namiko/README.md) for the above arguments' details.   
+See [README.md](https://github.com/NamikoMachida/Final_Project/blob/Namiko/README.md) for the arguments' details of this function.   
 
 
 ### Examples of function usage   
 * Basic specimen search and table visualization   
 ```{r Basic search, echo=TRUE}
-source("./function_final_project.R")
+source("./functions.R")
 collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
 ```   
 
@@ -34,17 +34,6 @@ collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"
 * Specimen search + Species list comparison  
 In here, a species level comparison between downloaded specimen data and a list of species of my interest. My species list is named as mytaxa.txt, which is stored in the same .Rproject directory. The argument of Search_Missing_Taxa is set as TRUE to find any specimen infomation that can expand current taxonomic coverage of my data.   
 ```{r Species comparison, echo=TRUE}
-source("./function_final_project.R")
+source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-
-
-
-
-
-
-
-
-
-
-
