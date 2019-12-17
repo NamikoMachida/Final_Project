@@ -32,7 +32,7 @@ collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"
 
 
 * Specimen search + Species list comparison  
-In here, a species level comparison between downloaded specimen data and a list of species of my interest. My species list is named as mytaxa.txt, which is stored in the same .Rproject directory. The argument of Search_Missing_Taxa is set as TRUE to find any specimen infomation that can expand current taxonomic coverage of my data.   
+In here, a species-level comparison between downloaded specimen data and a list of species of my interest. My species list is named as mytaxa.txt, which is stored in the same repository. The argument of Search_Missing_Taxa is set as TRUE to find any specimen information that can expand current taxonomic coverage of my data.   
 ```{r Species comparison, echo=TRUE}
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
