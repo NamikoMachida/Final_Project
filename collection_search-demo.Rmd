@@ -19,7 +19,7 @@ library(kableExtra)
 ```
 collection_search(Rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)
 ```   
-See [README.md](https://github.com/NamikoMachida/Final_Project/blob/Namiko/README.md) for the arguments' details of this function.   
+See [README.md](https://github.com/NamikoMachida/Final_Project/blob/master/README.md) for the arguments' details of this function.   
 
 
 ### Examples of function usage   

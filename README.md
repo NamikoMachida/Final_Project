@@ -32,7 +32,7 @@ All procedures from downloading the data to visualizing as a table are done in R
 
 ### __3. collection_search: Function Description__  
 ________________________________________________________________   
-A new function `collection_search` is created and stored in [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R) file in the same repository. To use the function, please source it from the file.
+A new function `collection_search` is created and stored in [functions.R](https://github.com/NamikoMachida/Final_Project/blob/master/functions.R) file in the same repository. To use the function, please source it from the file.
 ```
 source("./functions.R")
 ```   
@@ -71,7 +71,7 @@ collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"
 source("./functions.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-To see examples of their outputs, please clone this repository and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo.Rmd) or go to [collection_search-demo.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/Namiko/collection_search-demo.html) in which the function does some demonstrations.   
+To see examples of their outputs, please clone this repository and run [collection_search-demo.Rmd](https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.Rmd) or go to [collection_search-demo.html](https://htmlpreview.github.io/?https://github.com/NamikoMachida/Final_Project/blob/master/collection_search-demo.html) in which the function does some demonstrations.   
 
 
 ### __4. collection_search: Function Breakdown__   
@@ -123,7 +123,7 @@ data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$InstCod
 ```   
 
 #### __4. Text value capitalization__
-Since all the downloaded data comes in lowercases, case conversion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R)). 
+Since all the downloaded data comes in lowercases, case conversion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/master/functions.R)). 
 `cap_head` function works to capitalize the first letters of all words in a character string. Here, `text <- strsplit(string, "")[[1]]` splits `string` object by words and convert them into a character vector called `text`. Then, `substring(text, 1,1)` takes all the first letters from the `text` vector, which will be converted into uppercase letters by `toupper()` function. Finally, `paste(text, collapse = " ")` outputs the case converted elements of the `text` vector in a space-separated format. 
 ```
 # cap_head function
@@ -172,7 +172,7 @@ if (!is.null(Path)){
 ```   
 
 #### __6. Table production__  
-As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/Namiko/functions.R)). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
+As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of [functions.R](https://github.com/NamikoMachida/Final_Project/blob/master/functions.R)). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
 ```
 # Section 6 of collection_search funciton.
 
