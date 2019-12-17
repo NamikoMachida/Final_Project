@@ -1,4 +1,4 @@
-Search for Natural History Specimens in idigbio Database   
+Search Natural History Specimens in idigbio Database   
 -------------------------------------------------------------------------------------------------------------     
 
 ### Installing

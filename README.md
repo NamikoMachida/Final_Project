@@ -1,11 +1,8 @@
-# __Search for Natural History Specimens in idigbio Database__   
-##### one paragraph of project description
-##### the .Rmd will allow us to download museum specimen information from multiple museum collection database using [idigbio database](https://www.idigbio.org/).
-##### Each mus. has its own collection databases
-##### The new program will download specimen information of any taxonomic rank and group, and visually let you know   
+# __Search Natural History Specimens in idigbio Database__   
+##### Specimen based research in biology or paleontology requires a rigorous work in searching for relevent specimens stored in many natural history museums/institutions worldwide. To encourage researchers to utilise their collections, many museums/institutions have their own collection databases that are open to public, however, it is still time-consuming and hard to find out relevent specimens from separately organised databases. A rescently developed online database [idigbio](https://www.idigbio.org/) compiles specimen information from multiple museums, enabling us to conduct inter-museum collection searches. In here, a new function that utilizes `ridigbio` package is created to flexiblly accomodate users' needs in conducting specimen searches and help them indentify relevent museums for their research interest. 
 
 
-### __Getting Started__   
+### __1. Getting Started__   
 ________________________________________________________________   
 #### __Prerequisites__   
 ##### This project requires the following three R packages.   
@@ -28,29 +25,26 @@ library(kableExtra)
 ```   
 
 
-### __Language__   
+### __2. Language__   
 ________________________________________________________________   
 ##### All procedures from downloading the data to visualizing as a table are done in R.   
 
 
-### __collection_search: Function Description__  
+### __3. collection_search: Function Description__  
 ________________________________________________________________   
-##### A new function `collection_search` is created and stored in .R file in the .Rproject directory. Please sorce the function from the file in order to use wit.
+##### A new function `collection_search` is created and stored in .R file in the .Rproject directory. To use the function, please sorce it from the file.
 ```
 source("./function_final_project.R")
 ```   
-##### To see examples of usages and their results, please go to .Rmd or html in which the function does demonstrations.
-##### - [draft_commands.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/draft_commands.Rmd) 
-##### - [html]() 
 
 #### __Function Usage__   
 ```
 collection_search(rank, Taxon, Path = NULL, Search_Missing_Taxa = FALSE)
 ```   
 ##### Arguments   
-##### - `rank`: A character string of any taxonomic rank (e.g., "class", "order", "family"). The imput is case sensitive and all must be in lowercases.   
-##### - `Taxon`: Any taxonomic name(s) that correspond to the `rank` argument. This can accept multiple taxonomic names as a simple character vector (e.g., c("Acernaspis, Ananaspis", "Barrandeops")). The imput is case insensitive.   
-##### - `Path`: A path to a file that contains genus and species names of your interest. The taxon list must comprise two columns, genus and species, delimited by "," and without a header. The file may look like
+- `rank`: A character string of any taxonomic rank (e.g., "class", "order", "family"). The imput is case sensitive and all must be in lowercases.   
+- `Taxon`: Any taxonomic name(s) that correspond to the `rank` argument. This can accept multiple taxonomic names as a simple character vector (e.g., c("Acernaspis, Ananaspis", "Barrandeops")). The imput is case insensitive.   
+- `Path`: A path to a file that contains genus and species names of your interest. The taxon list must comprise two columns, genus and species, delimited by "," and without a header. The file may look like
 ```
 Acernaspis,aspera
 Ananaspis,aspera
@@ -58,10 +52,31 @@ Barrandeops,ovatus
 Boeckops,boecki
 Kainops,raymondi
 ```   
-##### - Search_Missing_Taxa: A logical argument about whether you want to find specimens of specific species in your taxon list (FALSE) or you want to find any specimens of species that are missing from your list (TRUE). Default is FALSE.   
+- `Search_Missing_Taxa`: A logical argument about whether you want to find specimens of specific species in your taxon list (FALSE) or you want to find any specimens of species that are missing from your list (TRUE). Default is FALSE.   
+
+#### __Examples__   
+##### This is a basic argument patterns of the `collection_search` function.   
+```
+# To search specimen information of a trilobite family Phacopidae
+source("./function_final_project.R")
+collection_search(rank = "family", Taxon = "Phacopidae")
+```   
+```
+# To search specimen information of three phacopid genera ("Acernaspis", "Ananaspis", "Kainops").
+source("./function_final_project.R")
+collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"))
+```   
+```
+# To find specimens of any taxa within trilobite family Acastidae that are missing from my own species list. 
+source("./function_final_project.R")
+collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
+```   
+##### To see examples of their outputs, please go to .Rmd or html in which the function does demonstrations.
+* [draft_commands.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/draft_commands.Rmd)
+* [html]() 
 
 
-### __collection_search: Function Breakdown__   
+### __4. collection_search: Function Breakdown__   
 ________________________________________________________________   
 ##### Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./function_final_project.R`.   
 
@@ -194,7 +209,8 @@ table_SpComparison <- function(data, Position){
 ```  
 
 
-### __Deployment__   
+### __5. Deployment__   
 ________________________________________________________________________________   
-### __Built with?__
-### __Versioning__   
+
+### __6. Author__
+##### __Namiko Machida__ -[NamikoMachida](https://github.com/NamikoMachida)
