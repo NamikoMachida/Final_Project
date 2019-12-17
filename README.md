@@ -1,11 +1,11 @@
 # __Search Natural History Specimens in idigbio Database__   
-##### Specimen based research in biology or paleontology requires a rigorous work in searching for relevent specimens stored in many natural history museums/institutions worldwide. To encourage researchers to utilise their collections, many museums/institutions have their own collection databases that are open to public, however, it is still time-consuming and hard to find out relevent specimens from separately organised databases. A rescently developed online database [idigbio](https://www.idigbio.org/) compiles specimen information from multiple museums, enabling us to conduct inter-museum collection searches. In here, a new function that utilizes `ridigbio` package is created to flexiblly accomodate users' needs in conducting specimen searches and help them indentify relevent museums for their research interest. 
+Specimen based research in biology or paleontology requires a rigorous work in searching for relevent specimens stored in many natural history museums/institutions worldwide. To encourage researchers to utilise their collections, many museums/institutions have their own collection databases that are open to public, however, it is still time-consuming and hard to find out relevent specimens from separately organised databases. A rescently developed online database [idigbio](https://www.idigbio.org/) compiles specimen information from multiple museums, enabling us to conduct inter-museum collection searches. In here, a new function that utilizes `ridigbio` package is created to flexiblly accomodate users' needs in conducting specimen searches and help them indentify relevent museums for their research interest. 
 
 
 ### __1. Getting Started__   
 ________________________________________________________________   
 #### __Prerequisites__   
-##### This project requires the following three R packages.   
+This project requires the following three R packages.   
 ```
 ridigbio
 knitr
@@ -14,7 +14,7 @@ kableExtra
 
 
 #### __Installing__
-##### Please install and library the three packages before using the function below.
+Please install and library the three packages before using the function below.
 ```
 install.packages("ridigbio")
 install.packages("knitr")
@@ -27,12 +27,12 @@ library(kableExtra)
 
 ### __2. Language__   
 ________________________________________________________________   
-##### All procedures from downloading the data to visualizing as a table are done in R.   
+All procedures from downloading the data to visualizing as a table are done in R.   
 
 
 ### __3. collection_search: Function Description__  
 ________________________________________________________________   
-##### A new function `collection_search` is created and stored in .R file in the .Rproject directory. To use the function, please sorce it from the file.
+A new function `collection_search` is created and stored in .R file in the .Rproject directory. To use the function, please sorce it from the file.
 ```
 source("./function_final_project.R")
 ```   
@@ -55,7 +55,7 @@ Kainops,raymondi
 - `Search_Missing_Taxa`: A logical argument about whether you want to find specimens of specific species in your taxon list (FALSE) or you want to find any specimens of species that are missing from your list (TRUE). Default is FALSE.   
 
 #### __Examples__   
-##### This is a basic argument patterns of the `collection_search` function.   
+This is a basic argument patterns of the `collection_search` function.   
 ```
 # To search specimen information of a trilobite family Phacopidae
 source("./function_final_project.R")
@@ -71,17 +71,17 @@ collection_search(rank = "genus", Taxon = c("Acernaspis", "Ananaspis", "Kainops"
 source("./function_final_project.R")
 collection_search(rank = "family", Taxon = "Acastidae", Path = "./mytaxa.txt", Search_Missing_Taxa = TRUE)
 ```   
-##### To see examples of their outputs, please go to .Rmd or html in which the function does demonstrations.
+To see examples of their outputs, please go to .Rmd or html in which the function does demonstrations.
 * [draft_commands.Rmd](https://github.com/NamikoMachida/Final_Project/blob/Namiko/draft_commands.Rmd)
 * [html]() 
 
 
 ### __4. collection_search: Function Breakdown__   
 ________________________________________________________________   
-##### Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./function_final_project.R`.   
+Here are detailed descriptions of codes in the `collection_search` function. This function is mainly composed of six sections, namely, _1. Production of error messages_, _2. Downloading data from idigbio_, _3. Data subsetting and sorting_, _4. Text value capitalization_, _5. Species comparison_, and _6. Table production_. Full function codes are found in `./function_final_project.R`.   
 
 ##### __1. Production of error messages__   
-##### This section produces error messages if inappropriate values are entered in the arguments. Since the `rank` and `Taxon` arguments must be in character values and the `Search_Missing_Taxa` must be in logical expression, combinations of "logical NOT operator" `!` and `is.character()` or `is.logical()` functions are used in if statements.   
+This section produces error messages if inappropriate values are entered in the arguments. Since the `rank` and `Taxon` arguments must be in character values and the `Search_Missing_Taxa` must be in logical expression, combinations of "logical NOT operator" `!` and `is.character()` or `is.logical()` functions are used in if statements.   
 ```   
 if (!is.character(rank)){
   stop("rank must be a character string (e.g. rank = \"genus\").")
@@ -93,7 +93,7 @@ if (!is.logical(Search_Missing_Taxa)){
   stop("Search_Missing_Taxa must be either TRUE/FALSE. Default is FALSE.")
 }
 ```   
-##### Since the `rank` argument is case sensitive and must be in lowercases, an additional error message will be provided if any uppercase letters are included in the argument. `strsplit(rank, "")[[1]]` will split the character string by letters and return as a character vector. `toupper()` function will converts any letters into uppercase letters. Thus, `any(strsplit(rank, "")[[1]] == toupper(strsplit(rank, "")[[1]]))` can test whether `rank` argument contains uppercase letters or not.   
+Since the `rank` argument is case sensitive and must be in lowercases, an additional error message will be provided if any uppercase letters are included in the argument. `strsplit(rank, "")[[1]]` will split the character string by letters and return as a character vector. `toupper()` function will converts any letters into uppercase letters. Thus, `any(strsplit(rank, "")[[1]] == toupper(strsplit(rank, "")[[1]]))` can test whether `rank` argument contains uppercase letters or not.   
 ```  
 if (any(strsplit(rank, "")[[1]] == toupper(strsplit(rank, "")[[1]]))){
   stop("rank must be in lower case characters.")
@@ -101,7 +101,7 @@ if (any(strsplit(rank, "")[[1]] == toupper(strsplit(rank, "")[[1]]))){
 ```  
 
 ##### __2. Downloading data from idigbio__   
-##### Main function that downloads museum specimen information from idigbio database is `idig_search_records(rq, fields)`. `rq` is a record query argument in nested list format that takes taxonomic names as list elements and taxonomic rank as the name of the list. In here, the character vector `Taxon` is made into a list called `idiglist` and named as `rank` input. `fields` is set as "all" to download all the available data from the database.
+Main function that downloads museum specimen information from idigbio database is `idig_search_records(rq, fields)`. `rq` is a record query argument in nested list format that takes taxonomic names as list elements and taxonomic rank as the name of the list. In here, the character vector `Taxon` is made into a list called `idiglist` and named as `rank` input. `fields` is set as "all" to download all the available data from the database.
 ```
 idiglist <- list(Taxon)
 names(idiglist) <- c(rank)
@@ -109,24 +109,24 @@ data <- idig_search_records(rq=idiglist, fields = "all")
 ```   
 
 #### __3. Data subsetting and sorting__   
-##### First, 12 columns that covers information of institutions, specimen IDs, taxonomic classifications, geologic ages, and specimen localities are extracted from the raw data downloaded in the previous section. The newly subsetted data is named as `data_selected`. Column names of the `data_selected` are converted into more user friendly names.
+First, 12 columns that covers information of institutions, specimen IDs, taxonomic classifications, geologic ages, and specimen localities are extracted from the raw data downloaded in the previous section. The newly subsetted data is named as `data_selected`. Column names of the `data_selected` are converted into more user friendly names.
 ```
 col_needed <- c("institutioncode", "catalognumber", "order", "family", "genus", "specificepithet", "earliestperiodorlowestsystem", "latestperiodorhighestsystem", "country", "stateprovince", "county", "formation")
 data_selected <- data[, col_needed]
 colnames(data_selected) <- c("InstCode", "Col.ID", "Order", "Family", "Genus", "species", "earliest", "latest", "Country", "State", "County", "Fm.")
 ```   
-##### Then, a hierarchical sorting is conducted. `order()` function in row argument rearranges the rows of `data_selected` based on the values in "institutioncode", "genus", and "specificepithet" columns with a hierarchical prioritization. The subsetted data is now named as `data_selected_sorted`. In this way, the specimen data is systematically grouped by institutions, genus, and species names.  
+Then, a hierarchical sorting is conducted. `order()` function in row argument rearranges the rows of `data_selected` based on the values in "institutioncode", "genus", and "specificepithet" columns with a hierarchical prioritization. The subsetted data is now named as `data_selected_sorted`. In this way, the specimen data is systematically grouped by institutions, genus, and species names.  
 ```
 data_selected_sorted <- data_selected[order(data_selected$InstCode, data_selected$Genus, data_selected$species),]
 ```   
-##### Finally, all rows with NA values in institutional code are removed.
+Finally, all rows with NA values in institutional code are removed.
 ```
 data_selected_sorted <- data_selected_sorted[!is.na(data_selected_sorted$InstCode), ]
 ```   
 
 #### __4. Text value capitalization__
-##### Since all the downloaded data comes in lowercases, case convertion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of .R file). 
-##### `cap_head` function works to capitalize the first letters of all words in a character string. In here, `text <- strsplit(string, "")[[1]]` splits `string` object by words and convert them into a character vector called `text`. Then, `substring(text, 1,1)` takes all the first letters from `text` vector, which will be converted into uppercase letters by `toupper()` function. Finally, `paste(text, collapse = " ")` outputs the case converted elements of `text` vector in space separated format. 
+Since all the downloaded data comes in lowercases, case convertion is conducted for certain columns by using two newly created functions, `cap_head` and `cap_head_age` (these are stored in the bottom of .R file). 
+`cap_head` function works to capitalize the first letters of all words in a character string. In here, `text <- strsplit(string, "")[[1]]` splits `string` object by words and convert them into a character vector called `text`. Then, `substring(text, 1,1)` takes all the first letters from `text` vector, which will be converted into uppercase letters by `toupper()` function. Finally, `paste(text, collapse = " ")` outputs the case converted elements of `text` vector in space separated format. 
 ```
 # cap_head function
 
@@ -136,7 +136,7 @@ cap_head <- function(string) {
   paste(text, collapse = " ")
 }
 ```  
-##### `cap_head_age` function has similar structure with `cap_head` function but works specifically for names of geologic periods without capitalizing prefixes of "early", "middle", and "late". All names of geological period are stored in a character vector `periods`. `substring(text[text %in% periods], 1,1)` takes only the first letter of geological period from `text` vector, which will be uppercased by `toupper` function.  
+`cap_head_age` function has similar structure with `cap_head` function but works specifically for names of geologic periods without capitalizing prefixes of "early", "middle", and "late". All names of geological period are stored in a character vector `periods`. `substring(text[text %in% periods], 1,1)` takes only the first letter of geological period from `text` vector, which will be uppercased by `toupper` function.  
 ```
 # cap_head_age function
 
@@ -147,7 +147,7 @@ cap_head_age <- function(string) {
   paste(text, collapse = " ")
 }
 ```  
-##### In section 4 of the `collection_search` function, `head_cap` is applied to columns regarding biologic classifications down to genus level and columns of locality information. `head_cap_age` is applied to columns of the earliest and latest geologic period.
+In section 4 of the `collection_search` function, `cap_head` is applied to columns regarding biologic classifications down to genus level and columns of locality information. `cap_head_age` is applied to columns of the earliest and latest geologic period.
 ```
 # Section 4 of collection_search function.
 
@@ -159,8 +159,8 @@ data_selected_sorted[,col_to_cap_age] <- apply(data_selected_sorted[,col_to_cap_
 ```   
 
 #### __5. Species comparison__
-##### If the user enters a file path into the `Path` argument, which means `!is.null(Path)` is TURE, a species comparison between the downloaded data and user's own species list will be conducted. The user's species list is read and set as a data.frame called `MyTaxa` with column names of "Genus" and "species". Then, row numbers of certain genus and species combinations in `data_selected_sorted`, that match those of `MyTaxa`, are identified and stored in a vector called `position`. If the user defines `Search_Missing_Taxa` argument as "TRUE", the row numbers in the `position` vector will be reversed so that the `position` vector has row numbers of genus and species combinations that are missing from `MyTaxa` list.
-##### With a nested structure of the above two if statements, the user can look up specific taxa in his/her species list or serach for any specimens that are missing from his/her list.
+If the user enters a file path into the `Path` argument, which means `!is.null(Path)` is TURE, a species comparison between the downloaded data and user's own species list will be conducted. The user's species list is read and set as a data.frame called `MyTaxa` with column names of "Genus" and "species". Then, row numbers of certain genus and species combinations in `data_selected_sorted`, that match those of `MyTaxa`, are identified and stored in a vector called `position`. If the user defines `Search_Missing_Taxa` argument as "TRUE", the row numbers in the `position` vector will be reversed so that the `position` vector has row numbers of genus and species combinations that are missing from `MyTaxa` list.
+With a nested structure of the above two if statements, the user can look up specific taxa in his/her species list or serach for any specimens that are missing from his/her list.
 ```
 position <- c()
 if (!is.null(Path)){
@@ -174,7 +174,7 @@ if (!is.null(Path)){
 ```   
 
 #### __6. Table production__  
-##### As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of .R file). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
+As a final step of the function, `data_selected_sorted` is expressed in a table format by using either one of newly created table producing functions, `table_SpComparison` or `simple_table` (these are stored in the bottom of .R file). The choice of table producing function is dependent on `length(position) >= 1` is TRUE or not, meaning whether one or more rows need to be highlighted or not.
 ```
 # Section 6 of collection_search funciton.
 
@@ -184,7 +184,7 @@ if (length(position) >= 1){
   simple_table(data = data_selected_sorted)
   }
 ```   
-##### `simple_table` function uses functions of `kniter` and `kableExtra` packages. In arguments of `kable()` function, a data.frame is taken as an imput data, table format is set as "html" (`format = "html"`), values are aligned on the left (`align = "l"`), the column of row names is hidden (`row.names = FALSE`), and whole text color in the table is set as black (`table.attr = "style = \"color: black;\""`). In the `kable_styling()` argument, the rows are color alternated and slightly shortened in length (`bootstrap_options = ("striped", "condensed")`), laterally made into compact (`full_width = F`), outout position of the whole table as left side (`position = "left"`), font size of the text as 12 point (`font_size = 12`), and the headder row are freazed at the top of the table when scrolled (`fixed_thead = T`). Categories of columns are displayed over the column names by using `add_header_above = c()`. To clearly show the institutional groupings of the specimen information, cells with repeated values in "InstCode" column is merged and the content is aligned at the top of the cell (`collapse_rows(columns = 1, valign = "top")`).   
+`simple_table` function uses functions of `kniter` and `kableExtra` packages. In arguments of `kable()` function, a data.frame is taken as an imput data, table format is set as "html" (`format = "html"`), values are aligned on the left (`align = "l"`), the column of row names is hidden (`row.names = FALSE`), and whole text color in the table is set as black (`table.attr = "style = \"color: black;\""`). In the `kable_styling()` argument, the rows are color alternated and slightly shortened in length (`bootstrap_options = ("striped", "condensed")`), laterally made into compact (`full_width = F`), outout position of the whole table as left side (`position = "left"`), font size of the text as 12 point (`font_size = 12`), and the headder row are freazed at the top of the table when scrolled (`fixed_thead = T`). Categories of columns are displayed over the column names by using `add_header_above = c()`. To clearly show the institutional groupings of the specimen information, cells with repeated values in "InstCode" column is merged and the content is aligned at the top of the cell (`collapse_rows(columns = 1, valign = "top")`).   
 ```
 # simple_table function
 
@@ -195,7 +195,7 @@ simple_table <- function(data){
     collapse_rows(columns = 1, valign = "top")
 }
 ``` 
-##### `table_SpComparison` function has the exactly same lines as those of `simple_table` function except having a line of `row_spec(Position, color = "red")`. With this additional formatting, in which the `Position` is a numeric vector of row numbers, specified rows can be highlited in red in the output table.
+`table_SpComparison` function has the exactly same lines as those of `simple_table` function except having a line of `row_spec(Position, color = "red")`. With this additional formatting, in which the `Position` is a numeric vector of row numbers, specified rows can be highlited in red in the output table.
 ```
 # table_SpComparison function
 
@@ -213,4 +213,4 @@ table_SpComparison <- function(data, Position){
 ________________________________________________________________________________   
 
 ### __6. Author__
-##### __Namiko Machida__ -[NamikoMachida](https://github.com/NamikoMachida)
+__Namiko Machida__ -- [NamikoMachida](https://github.com/NamikoMachida)
