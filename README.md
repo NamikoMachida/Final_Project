@@ -219,12 +219,11 @@ ________________________________________________________________________________
 
 ### __5. Authors__   
 ________________________________________________________________________________   
-__Namiko Machida__ -Most work- [NamikoMachida](https://github.com/NamikoMachida)  
-__Amy Hessl__ -Advisor-  
+__Namiko Machida__  
+[NamikoMachida](https://github.com/NamikoMachida)  
+ 
 
 
 ### __6. Acknowledgments__   
 ________________________________________________________________________________   
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+__Amy Hessl__ -Advisor- 
